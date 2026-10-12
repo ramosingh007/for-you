@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A question for you 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Caveat:wght@600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2a0f24;--plum:#4a1942;--rose:#ff4d7d;--blush:#ffd6e3;--gold:#ffc46b;--paper:#fff7fa;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(120% 90% at 50% 0%,#7a2760 0%,#3b1236 55%,#220a20 100%);color:var(--paper);font-family:'DM Sans',system-ui,sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
+#hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.heart{position:absolute;bottom:-40px;opacity:.0;animation:rise linear infinite;filter:drop-shadow(0 0 8px rgba(255,77,125,.6))}
+@keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.7}100%{transform:translateY(-110vh) rotate(40deg);opacity:0}}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;padding-top:calc(24px + env(safe-area-inset-top,0px))}
+.screen.on{display:flex;animation:pop .6s cubic-bezier(.2,1.3,.4,1)}
+@keyframes pop{from{opacity:0;transform:scale(.92) translateY(14px)}to{opacity:1;transform:none}}
+.emoji{font-size:84px;line-height:1;animation:beat 1.3s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.12)}}
+.hand{font-family:'Caveat',cursive;font-size:30px;color:var(--gold);margin:14px 0 0}
+h1{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(34px,9vw,52px);line-height:1.1;margin:8px 0 28px;max-width:14ch;text-wrap:balance}
+h1 em{color:var(--blush)}
+.row{display:flex;gap:16px;align-items:center;justify-content:center;min-height:70px}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:16px 38px;font-size:19px;font-weight:700;touch-action:manipulation}
+#yes{background:linear-gradient(135deg,#ff4d7d,#ff7a59);color:#fff;box-shadow:0 10px 30px rgba(255,77,125,.5);transition:transform .25s}
+#yes:active{transform:scale(.95)}
+#no{background:rgba(255,255,255,.14);color:var(--paper);border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(6px);transition:left .22s cubic-bezier(.3,1.4,.5,1),top .22s cubic-bezier(.3,1.4,.5,1)}
+#no.run{position:fixed;z-index:10}
+#hint{min-height:28px;margin-top:22px;color:var(--blush);font-size:15px;opacity:.9}
+.card{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(14px);border-radius:28px;padding:26px 22px;width:100%;max-width:400px;text-align:left}
+label{display:block;font-weight:700;font-size:14px;margin:0 0 8px;color:var(--blush)}
+input[type=date],input[type=time]{width:100%;font:inherit;font-size:18px;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);color:#fff;color-scheme:dark;margin-bottom:20px}
+input:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 22px}
+.chip{padding:9px 14px;font-size:14px;font-weight:500;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.chip.sel{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+#go{width:100%;background:linear-gradient(135deg,#ff4d7d,#ff7a59);color:#fff;box-shadow:0 10px 30px rgba(255,77,125,.45)}
+#go:disabled{opacity:.45;box-shadow:none}
+.when{font-family:'Fraunces',serif;font-size:clamp(24px,7vw,34px);background:rgba(255,255,255,.1);border:1px dashed var(--gold);border-radius:22px;padding:18px 22px;margin:6px 0 20px;line-height:1.3}
+.msg{max-width:340px;line-height:1.6;color:var(--blush);margin:0 0 22px}
+a.wa{display:inline-block;background:#25d366;color:#052e16;text-decoration:none;border-radius:999px;padding:14px 26px;font-weight:700}
+.confetti{position:fixed;top:-20px;font-size:22px;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg);opacity:.9}}
+@media (prefers-reduced-motion:reduce){.heart,.emoji,.confetti{animation:none}.screen.on{animation:none}}
+</style>
+</head>
+<body>
+<div id="hearts" aria-hidden="true"></div>
+
+<!-- 1 · Ask -->
+<section class="screen on" id="s1">
+  <div class="emoji">💌</div>
+  <p class="hand" id="hello">Hey you…</p>
+  <h1>Will you go on a <em>date</em> with me?</h1>
+  <div class="row"><button id="yes">Yes 💖</button><button id="no">No</button></div>
+  <div id="hint"></div>
+</section>
+
+<!-- 2 · Pick -->
+<section class="screen" id="s2">
+  <div class="emoji" style="font-size:60px">🥰</div>
+  <h1 style="margin-bottom:18px">Yay! Now pick our day</h1>
+  <div class="card">
+    <label for="d">Which day?</label>
+    <input type="date" id="d">
+    <label for="t">What time?</label>
+    <input type="time" id="t">
+    <div class="chips" id="chips"></div>
+    <button id="go" disabled>Lock it in 💫</button>
+  </div>
+</section>
+
+<!-- 3 · Thanks -->
+<section class="screen" id="s3">
+  <div class="emoji">🌹</div>
+  <p class="hand">It's a date!</p>
+  <h1 style="max-width:16ch">Thank you for saying yes</h1>
+  <div class="when" id="when"></div>
+  <p class="msg">You just made my whole week. I'll plan something special, so all you need to do is show up and smile. Can't wait to see you ✨</p>
+  <a class="wa" id="wa" href="#" target="_blank" rel="noopener" style="display:none">Send me a message 💬</a>
+</section>
+
+<script>
+// ✏️ Edit these two lines
+const YOUR_NAME = "";          // e.g. "Raj"
+const YOUR_WHATSAPP = "";      // e.g. "919876543210" (country code + number, no +). Leave empty to hide the button.
+
+const $ = id => document.getElementById(id);
+const show = n => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $('s'+n).classList.add('on'); };
+if (YOUR_NAME) $('hello').textContent = "Hey you, it's " + YOUR_NAME + "…";
+
+// floating hearts
+const hb = $('hearts'); const sy = ['💗','💖','💕','✨','🌸'];
+for (let i = 0; i < 16; i++) {
+  const h = document.createElement('span'); h.className = 'heart';
+  h.textContent = sy[i % sy.length];
+  h.style.left = Math.random()*100 + '%'; h.style.fontSize = (14 + Math.random()*22) + 'px';
+  h.style.animationDuration = (9 + Math.random()*10) + 's'; h.style.animationDelay = (-Math.random()*18) + 's';
+  hb.appendChild(h);
+}
+
+// runaway No button
+const no = $('no'), yes = $('yes'), hint = $('hint');
+const lines = ["Nice try 😏","Too slow!","Are you sure? 🥺","Pretty please?","The Yes button is right there 👀","Don't break my heart 💔","Can't catch me!","Just say yes 😘"];
+let dodges = 0, scale = 1;
+function dodge(e){
+  if (e && e.cancelable) e.preventDefault();
+  no.classList.add('run');
+  const m = 12, w = no.offsetWidth, h = no.offsetHeight;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const yr = yes.getBoundingClientRect();
+  let x, y, tries = 0;
+  do {
+    x = m + Math.random()*(vw - w - 2*m);
+    y = m + Math.random()*(vh - h - 2*m);
+    tries++;
+  } while (tries < 30 && (x < yr.right + 16 && x + w > yr.left - 16 && y < yr.bottom + 16 && y + h > yr.top - 16));
+  no.style.left = x + 'px'; no.style.top = y + 'px';
+  hint.textContent = lines[dodges % lines.length]; dodges++;
+  scale = Math.min(1.6, scale + 0.06); yes.style.transform = 'scale(' + scale + ')';
+}
+['pointerenter','touchstart','mousedown','click','focus'].forEach(ev => no.addEventListener(ev, dodge, {passive:false}));
+document.addEventListener('pointermove', e => {
+  if (!$('s1').classList.contains('on')) return;
+  const r = no.getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  if (Math.hypot(e.clientX - cx, e.clientY - cy) < 80) dodge();
+});
+// first dodge from its spot when finger lands anywhere near
+$('s1').addEventListener('touchstart', e => {
+  const r = no.getBoundingClientRect(), t = e.touches[0];
+  if (Math.hypot(t.clientX - (r.left + r.width/2), t.clientY - (r.top + r.height/2)) < 70) dodge(e);
+}, {passive:false});
+
+yes.addEventListener('click', () => { burst(18); show(2); });
+
+// date & time
+const d = $('d'), t = $('t'), go = $('go');
+const today = new Date(); today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+d.min = today.toISOString().slice(0,10);
+[['Coffee ☕','11:00'],['Lunch 🍝','13:00'],['Sunset 🌇','17:30'],['Dinner 🕯️','20:00']].forEach(([l,v]) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = l + ' · ' + fmtT(v);
+  b.onclick = () => { t.value = v; mark(b); check(); };
+  $('chips').appendChild(b);
+});
+function mark(b){ document.querySelectorAll('.chip').forEach(c => c.classList.remove('sel')); if (b) b.classList.add('sel'); }
+function check(){ go.disabled = !(d.value && t.value); }
+d.addEventListener('input', check);
+t.addEventListener('input', () => { mark(null); check(); });
+function fmtT(v){ const [h,m] = v.split(':').map(Number); return ((h%12)||12) + ':' + String(m).padStart(2,'0') + ' ' + (h<12?'AM':'PM'); }
+
+go.addEventListener('click', () => {
+  const [y,mo,da] = d.value.split('-').map(Number);
+  const day = new Date(y, mo-1, da).toLocaleDateString(undefined, {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const text = day + '<br>at ' + fmtT(t.value);
+  $('when').innerHTML = '📅 ' + text;
+  if (YOUR_WHATSAPP) {
+    const msg = "Yes! 💖 Our date is on " + day + " at " + fmtT(t.value) + ".";
+    const a = $('wa'); a.href = 'https://wa.me/' + YOUR_WHATSAPP + '?text=' + encodeURIComponent(msg); a.style.display = 'inline-block';
+  }
+  show(3); burst(40);
+});
+
+function burst(n){
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const set = ['💖','🌸','✨','💕','🎉','🌹'];
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('span'); c.className = 'confetti';
+    c.textContent = set[i % set.length]; c.style.left = Math.random()*100 + 'vw';
+    c.style.fontSize = (16 + Math.random()*18) + 'px';
+    c.style.animationDuration = (2.5 + Math.random()*2.5) + 's'; c.style.animationDelay = (Math.random()*.8) + 's';
+    document.body.appendChild(c); setTimeout(() => c.remove(), 6500);
+  }
+}
+</script>
+</body>
+</html>
